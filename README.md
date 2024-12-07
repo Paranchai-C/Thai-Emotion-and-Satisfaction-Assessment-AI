@@ -2,6 +2,12 @@
 Using fine-turned wav2vec2-large-xlsr-53-th model to analyze Thai people's emotions and derive a satisfaction score.  
 ![Poster](assets/poster.png)  
 
+My model can recognize three emotion  
+1.neutral  
+2.angry  
+3.happiness  
+My fine-turned wav2vec2-large-xlsr-53-th model  
+https://huggingface.co/Paranchai/wav2vec2-large-xlsr-53-th-speech-emotion-recognition-3c  
 ===========================  
  How to start this project  
 ===========================  
