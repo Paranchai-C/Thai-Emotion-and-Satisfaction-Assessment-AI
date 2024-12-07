@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>loading</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+    <div class="center">
+        <div class="loading">
+            <div class="circular-progress">
+                <span class="progress-value">0%</span>
+            </div>
+        </div>
+    </div>
+    
+   
+    <script>
+        let circularProgress = document.querySelector(".circular-progress"),
+            progressValue = document.querySelector(".progress-value");
+        let progressStartValue = 0,    
+            progressEndValue = 100,    
+            speed = 50;
+            
+        let progress = setInterval(() => {
+            progressStartValue++;
+            progressValue.textContent = `${progressStartValue}%`
+            circularProgress.style.background = `conic-gradient(#7d2ae8 ${progressStartValue * 3.6}deg, #ededed 0deg)`
+            if(progressStartValue == progressEndValue){
+                clearInterval(progress);
+                const response =  fetch('/getShow')
+                .then(response => response.json()) 
+                .then(data => {
+                    window.location.href = data.redirect_url;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }    
+        }, speed);
+
+    </script>
+</body>
+<script>
+    
+</script>
+</body>
+</html>

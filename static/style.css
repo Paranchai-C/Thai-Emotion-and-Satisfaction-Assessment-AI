@@ -1,0 +1,262 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    padding: 40px;
+    width: 400px;
+    animation: fadeIn 0.5s ease; /* เพิ่มการเคลื่อนไหว */
+}
+
+h1 {
+    margin-bottom: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #6200ea;
+    padding: 10px 0;
+    border-bottom: 3px solid #6200ea;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.button {
+    background-color: #6200ea; /* สีเริ่มต้น */
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 15px 30px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+    font-size: 16px;
+    margin: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.button:hover {
+    background-color: #7e7cff; /* สีเมื่อโฮเวอร์ */
+    transform: translateY(-2px); /* เพิ่มการเคลื่อนไหว */
+}
+
+#stopButton {
+    background-color: #ff4d4d; /* สีเมื่อกด */
+    display: none;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center; /* จัดตำแหน่งกลาง */
+}
+
+input[type="file"] {
+    display: none; /* ซ่อน input */
+}
+
+.file-label {
+    display: inline-block;
+    background-color: #6200ea;
+    color: white;
+    border-radius: 25px;
+    padding: 15px 30px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+    font-size: 16px;
+    margin: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.file-label:hover {
+    background-color: #7e7cff; /* สีเมื่อโฮเวอร์ */
+    transform: translateY(-2px); /* เพิ่มการเคลื่อนไหว */
+}
+
+canvas {
+    margin: 20px 0;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid #6200ea;
+    display: none; /* ซ่อน canvas ตอนเริ่มต้น */
+}
+#upload {
+    display: none; /* ซ่อนปุ่มอัพโหลดเริ่มต้น */
+    background-color: #90ee90; /* สีเขียวอ่อน */
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 15px 30px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+#upload:hover {
+    background-color: #76c76d; /* สีเมื่อโฮเวอร์ */
+}
+
+.upload-button-container {
+    width: 100%; /* ให้มีขนาดเต็มที่ */
+    display: flex;
+    justify-content: flex-end; /* ชิดขวา */
+    margin-top: 10px; /* ให้มีระยะห่างด้านบน */
+}
+
+.show {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+}
+.large-text{
+    font-size: 1.5em; /* ปรับขนาดตัวอักษร */
+    font-weight: bold; /* ทำให้ตัวหนา */
+}
+* {
+    margin: 0;
+    box-sizing: border-box;
+    --c1: #C1262C;
+    --c2: #DB5C23;
+    --c3: #F69220;
+    --c4: #8BA247;
+    --c5: #23B473;
+}
+
+.speedometer {
+    margin-top: 20px;
+    width: 250px;
+    height: 250px;
+    padding: 50px;
+    border-radius: 50%;
+    background:
+        radial-gradient(#ffff 0 0) content-box,
+        conic-gradient(
+            from -90deg,
+            var(--c1) 36deg,           /* First color spans 0 - 36 degrees */
+            var(--c2) 36deg 72deg,     /* Second color spans 36 - 72 degrees */
+            var(--c3) 72deg 108deg,    /* Third color spans 72 - 108 degrees */
+            var(--c4) 108deg 144deg,   /* Fourth color spans 108 - 144 degrees */
+            var(--c5) 144deg 180deg,   /* Fifth color spans 144 - 180 degrees */
+            #0000 180deg
+        );
+    position: relative;
+}
+
+.needle {
+    position: absolute;
+    width: 200px; 
+    height: 200px; 
+    padding: 80px;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%; 
+    border-radius: 50%;
+    background: 
+        conic-gradient(
+            from 175deg at 50% 55%,
+            #ccc 2deg,
+            #ea1c98 3deg 7deg,
+            #ccc 8deg 10deg,
+            #0000 0
+        ) 0 -105px no-repeat, 
+        radial-gradient(
+            #ea1c98 0 50%,
+            #ccc 51%
+        ) content-box;
+    transform: rotate(calc(cos(var(--score) * 180deg / 100) * -90deg)); /* ใช้ transform แทน rotate */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.score {
+    transform: rotate(calc(cos(var(--score) * 180deg / 100) * 90deg)); /* ใช้ transform แทน rotate */
+    font-size: 15px;
+    font-weight: 800;
+    color: #eeee;
+}
+
+.center{
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
+}
+.loading{
+    display: flex;
+    width: 420px;
+    padding: 50px 0;
+    border-radius: 8px;
+    background: #fff;
+    row-gap: 30px;
+    flex-direction: column;
+    align-items: center;
+}
+.circular-progress{
+    position: relative;
+    height: 250px;
+    width: 250px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #74ebd5 0%, #9face6 100%);
+    background: conic-gradient(#7d2ae8 3.6deg, #ededed 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.circular-progress::before{
+    content: "";
+    position: absolute;
+    height: 210px;
+    width: 210px;
+    border-radius: 50%;
+    background-color: #fff;
+}
+.progress-value{
+    position: relative;
+    font-size: 40px;
+    font-weight: 600;
+    color: #7d2ae8;
+}
+
+/* การเคลื่อนไหวสำหรับการแสดงผล */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.small-red {
+    font-size: 1em;   /* Adjust the size as needed (0.8em means 80% of parent size) */
+    color: #7d2ae8;         /* Sets the text color to red */
+}
+
+.legend {
+    display: flex;
+    flex-direction: column;  /* Arrange items vertically */
+    margin-top: 20px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;      /* Align color box and text vertically centered */
+    margin-bottom: 10px;      /* Add spacing between each item */
+}
+
+.color-box {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;       /* Space between color box and text */
+    border: 1px solid #000;   /* Optional: Add a border for visibility */
+}

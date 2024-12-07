@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>predict_emotion</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+<div class="container">
+    <h1>EMO-RATE</h1>
+    <div class="show">
+        <p class="large-text">คะแนนที่ได้: <span id="score"></span></p>
+        <p class="large-text">ประเมินความพึงพอใจได้ว่า:<br> <span id="value" class="small-red"></span></p>
+        <div class="speedometer">
+            <div class="needle" style="--score:0">
+                <span class="score"></span>
+            </div>
+        </div>
+
+        <!-- Vertical legend section -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="color-box" style="background-color: var(--c1);"></div>
+                <span>ไม่พึงพอใจอย่างยิ่ง</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: var(--c2);"></div>
+                <span>ไม่พึงพอใจ</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: var(--c3);"></div>
+                <span>พอใจปานกลาง</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: var(--c4);"></div>
+                <span>พอใจสูง</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box" style="background-color: var(--c5);"></div>
+                <span>พอใจมากที่สุด</span>
+            </div>
+        </div>
+    </div>
+    
+</div>
+<script>
+    async function loadData() {
+        try {
+            const response = await fetch('/getData');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            let satisfaction;
+            if (data.value === 'excellent') {
+                satisfaction = 'พอใจมากที่สุด';
+            } else if (data.value === 'good') {
+                satisfaction = 'พอใจสูง';
+            } else if (data.value === 'average') {
+                satisfaction = 'พอใจปานกลาง';
+            } else if (data.value === 'poor') {
+                satisfaction = 'ไม่พึงพอใจ';
+            } else if (data.value === 'very poor') {
+                satisfaction = 'ไม่พึงพอใจอย่างยิ่ง';
+            } else {
+                satisfaction = '';
+            }
+
+            console.log(satisfaction);
+            
+            // แสดงค่าที่ได้ใน x และ y
+            document.getElementById('score').innerText = data.score;
+            document.getElementById('value').innerText = satisfaction;
+
+            document.querySelector('.needle').style.setProperty('--score', data.score); // อัปเดต --score ใน style ของ needle
+            document.querySelector('.score').innerText = data.score;
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+    // โหลดข้อมูลเมื่อโหลดหน้าเว็บเสร็จ
+    window.onload = loadData;
+</script>
+</body>
+</html>

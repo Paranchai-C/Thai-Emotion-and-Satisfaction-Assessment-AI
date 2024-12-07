@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pattern Recognition</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+<div class="container">
+    <h1>EMO-RATE</h1>
+    <label for="fileInput" class="file-label">เลือกไฟล์เสียง</label>
+    <input type="file" id="fileInput" accept=".mp3, .flac, .wav" />
+    <canvas id="visualizer" width="300" height="100"></canvas>
+    <div class="button-container">
+        <button id="recordButton" class="button" onclick="startRecording()">เริ่มอัดเสียง</button>
+        <button id="stopButton" class="button" onclick="stopRecording()">หยุดอัดเสียง</button>
+    </div>
+    <audio id="audioPlayback" controls></audio>
+    <div class="upload-button-container">
+        <button id="upload" class="button" onclick="upload()">อัพโหลด</button>
+    </div>
+</div>
+
+<script>
+    let mediaRecorder;
+    let audioChunks = [];
+    let audioContext;
+    let analyser;
+    let dataArray;
+    let audioUpload;
+    let animationId;
+
+    async function startRecording() {
+        document.getElementById('fileInput').disabled = true; 
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyser);
+        
+        analyser.fftSize = 256;
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        mediaRecorder.start();
+
+        mediaRecorder.addEventListener('dataavailable', event => {
+            audioChunks.push(event.data);
+        });
+        document.getElementById('visualizer').style.display = 'block';
+        drawVisualizer();
+
+        const response = await fetch('/start_recording', { method: 'POST' });
+        if (response.ok) {
+            document.getElementById('recordButton').style.display = 'none';
+            document.getElementById('stopButton').style.display = 'block';
+        } else {
+            alert('ไม่สามารถเริ่มการบันทึกเสียงได้');
+        }
+    }
+
+    async function stopRecording() {
+        const response = await fetch('/stop_recording', { method: 'POST' });
+        console.log(response);
+        
+        if (response.ok) {
+            cancelAnimationFrame(animationId);
+            const blob = await response.blob();
+            audioUpload = blob;
+
+            const audioUrl = URL.createObjectURL(blob);
+            const audioPlayback = document.getElementById('audioPlayback');
+            audioPlayback.src = audioUrl;
+            audioPlayback.play();
+            document.getElementById('upload').style.display = 'block';
+            document.getElementById('recordButton').style.display = 'block';
+            document.getElementById('visualizer').style.display = 'none'; 
+            document.getElementById('stopButton').style.display = 'none';
+            document.getElementById('fileInput').disabled = false;
+        } else {
+            console.log("ไม่สามารถหยุดการบันทึกเสียงได้");
+        }
+    }
+
+    document.getElementById('fileInput').addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        audioUpload = file;
+        const fileType = file.type;
+        if (fileType !== 'audio/mpeg' && fileType !== 'audio/wav' && fileType !== 'audio/flac') {
+            alert('Invalid file type. Please upload an MP3 or WAV or FLAC file.');
+            return;
+        }
+        if (file) {
+            const audioPlayback = document.getElementById('audioPlayback');
+            const audioUrl = URL.createObjectURL(file);
+            audioPlayback.src = audioUrl;
+            audioPlayback.play();
+            document.getElementById('upload').style.display = 'flex';
+        }
+    });
+    
+    function upload() {
+        const formData = new FormData();
+        formData.append('file', audioUpload, 'recording.mp3');
+
+        fetch('/audio', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json()) 
+        .then(data => {
+            window.location.href = data.redirect_url;
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+    }
+
+    function drawVisualizer() {
+        const canvas = document.getElementById('visualizer');
+        const canvasCtx = canvas.getContext('2d');
+
+        analyser.getByteFrequencyData(dataArray);
+        
+        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+        canvasCtx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const barWidth = (canvas.width / dataArray.length) * 1.5;
+        let x = 0;
+
+        for (let i = 0; i < dataArray.length; i++) {
+            const barHeight = dataArray[i];
+
+            const red = Math.min(255, barHeight + 100);
+            const green = Math.max(0, 255 - barHeight);
+            const blue = 50;
+            
+            canvasCtx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
+            canvasCtx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight / 2);
+            
+            canvasCtx.strokeStyle = 'white';
+            canvasCtx.lineWidth = 2;
+            canvasCtx.beginPath();
+            canvasCtx.moveTo(x, canvas.height - barHeight / 2);
+            canvasCtx.lineTo(x + barWidth, canvas.height - barHeight / 2);
+            canvasCtx.stroke();
+
+            x += barWidth + 2;
+        }
+
+        animationId = requestAnimationFrame(drawVisualizer);
+    }
+</script>
+</body>
+</html>
